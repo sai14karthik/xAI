@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction with CSV Upload</title>
+</head>
+<body>
+    <h1>Upload CSV File for Prediction</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="file">Choose a CSV file:</label>
+        <input type="file" id="file" name="file" accept=".csv" required>
+        <button type="submit">Upload and Predict</button>
+    </form>
+
+    <h2>Prediction Result</h2>
+    <div id="result"></div>
+
+    <script>
+        // Handle form submission for file upload
+        document.getElementById("uploadForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Prepare the form data (CSV file)
+            const formData = new FormData();
+            const fileInput = document.getElementById("file");
+            formData.append("file", fileInput.files[0]);
+
+            // Send the file to the Flask backend
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.prediction) {
+                    // Display the prediction result
+                    document.getElementById("result").innerHTML = "Prediction: " + result.prediction;
+                } else if (result.error) {
+                    document.getElementById("result").innerHTML = "Error: " + result.message;
+                }
+            })
+            .catch(error => {
+                document.getElementById("result").innerHTML = "Error: " + error.message;
+            });
+        });
+    </script>
+</body>
+</html>
